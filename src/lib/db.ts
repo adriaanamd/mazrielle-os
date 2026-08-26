@@ -32,7 +32,9 @@ async function applyOwnerContext(db: PGlite, ownerId: string): Promise<void> {
   await db.query("SELECT set_config('app.user_id', $1, false)", [ownerId]);
 }
 
-async function initSchema(db: PGlite): Promise<void> {
+const LOCAL_TABLES_WITH_FOLDER_ID = ['folders', 'credentials', 'notes', 'tasks', 'income', 'activity_log'] as const;
+
+export async function initSchema(db: PGlite): Promise<void> {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS vault_meta (
       owner_id TEXT PRIMARY KEY,
@@ -128,6 +130,8 @@ async function initSchema(db: PGlite): Promise<void> {
     ALTER TABLE app_settings FORCE ROW LEVEL SECURITY;
   `);
 
+  await migrateLocalSchema(db);
+
   await createOwnerPolicy(db, 'vault_meta');
   await createOwnerPolicy(db, 'folders');
   await createOwnerPolicy(db, 'credentials');
@@ -136,6 +140,12 @@ async function initSchema(db: PGlite): Promise<void> {
   await createOwnerPolicy(db, 'income');
   await createOwnerPolicy(db, 'activity_log');
   await createOwnerPolicy(db, 'app_settings');
+}
+
+async function migrateLocalSchema(db: PGlite): Promise<void> {
+  for (const table of LOCAL_TABLES_WITH_FOLDER_ID) {
+    await db.exec(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS folder_id TEXT;`);
+  }
 }
 
 async function createOwnerPolicy(db: PGlite, table: string): Promise<void> {
