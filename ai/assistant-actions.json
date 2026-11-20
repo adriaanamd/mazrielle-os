@@ -1,0 +1,24 @@
+{
+  "applications": {
+    "calendar": {
+      "label": "Calendar",
+      "launchTarget": "Calendar"
+    },
+    "downloads": {
+      "label": "Downloads",
+      "launchTarget": "Downloads"
+    },
+    "spotify": {
+      "label": "Spotify",
+      "launchTarget": "Spotify",
+      "processName": "Spotify.exe"
+    }
+  },
+  "projects": {},
+  "settings": {
+    "projectRoot": "../../../",
+    "reminderPath": "reminders.json",
+    "weatherLocation": "Olongapo, Philippines",
+    "repositoryPath": ".."
+  }
+}
